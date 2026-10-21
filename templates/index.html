@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<!-- NetSentinel: QoS-Aware Network Intrusion Detection Using Comparative Machine Learning -->
+<!-- 23CSE301 · Machine Learning Capstone Project -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetSentinel — Comparative Algorithmic Laboratory</title>
+    <meta name="description" content="NetSentinel Capstone: Select a dataset, configure flow telemetry inputs, and compare answers across all evaluated machine learning algorithms.">
+    
+    <!-- Classic Google Fonts: Newsreader (Serif) + Inter (Sans) + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for clean classic comparison charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Classic, Clean Styling -->
+    <link rel="stylesheet" href="/static/css/style.css?v=20261022_1">
+</head>
+<body>
+
+    <div class="page-container">
+
+        <!-- Classic Header -->
+        <header class="classic-header">
+            <div class="header-inner">
+                <div class="header-titles">
+                    <span class="header-pretitle">23CSE301 · Machine Learning Capstone</span>
+                    <h1 class="header-main-title">🛡️ NetSentinel: Comparative Algorithmic Laboratory</h1>
+                    <p class="header-subtitle">Select a dataset to configure input features and evaluate comparative predictions across all trained algorithms.</p>
+                </div>
+                <div class="header-badges">
+                    <span class="status-pill"><span class="status-dot"></span> System Online</span>
+                    <span class="status-pill text-muted">Python 3.11 · Scikit-Learn</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 1: DATASET SELECTION (3 DATASETS PRESENTATION)            -->
+        <!-- ============================================================== -->
+        <section id="datasetSelectionView" class="dataset-selection-view">
+            <div class="section-lead">
+                <h2 class="section-title">Select a Dataset to Begin</h2>
+                <p class="section-desc">Choose one of the three capstone tracks below. You will be prompted to enter inputs and view predictions from all evaluated algorithms.</p>
+            </div>
+
+            <div class="datasets-grid">
+                <!-- Dataset 1: Regression (UNSW-NB15 QoS & Packet Loss) -->
+                <article class="dataset-card" id="cardRegression" style="cursor: pointer;" onclick="selectDataset('regression')">
+                    <div class="card-track-badge badge-regression">Track 1 · Regression</div>
+                    <h3 class="card-title">UNSW-NB15 Flow QoS</h3>
+                    <p class="card-desc">Forecast continuous source packet loss (<code>sloss</code>) and Quality of Service (QoS) degradation based on flow duration, rate, bytes, and packet metrics.</p>
+                    
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Dataset</span>
+                            <span class="meta-value">UNSW-NB15 Telemetry (175,341 rows)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Evaluated</span>
+                            <span class="meta-value"><strong>10 Algorithms</strong> (Random Forest, Gradient Boosting, Tree, SVR, KNN, etc.)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Champion Model</span>
+                            <span class="meta-value">Random Forest Regressor (R² = 0.9997, RMSE = 1.391)</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block select-dataset-btn" onclick="event.stopPropagation(); selectDataset('regression')">
+                        Select UNSW-NB15 Dataset &rarr;
+                    </button>
+                </article>
+
+                <!-- Dataset 2: Classification (CIC-IDS2017 Threat Detection) -->
+                <article class="dataset-card" id="cardClassification" style="cursor: pointer;" onclick="selectDataset('classification')">
+                    <div class="card-track-badge badge-classification">Track 2 · Classification</div>
+                    <h3 class="card-title">CIC-IDS2017 Intrusion Detection</h3>
+                    <p class="card-desc">Real-time multi-class detection of cyber threats (DoS Hulk, PortScan, SSH-Patator, Web Attacks) vs benign network communication.</p>
+                    
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Dataset</span>
+                            <span class="meta-value">CIC-IDS2017 Cohort (Multi-Class Flows)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Evaluated</span>
+                            <span class="meta-value"><strong>10 Algorithms</strong> (Random Forest, Logistic Reg, SVC, MLP, Bagging, etc.)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Champion Model</span>
+                            <span class="meta-value">Random Forest Classifier (ROC-AUC = 0.9799, F1 = 0.864)</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block select-dataset-btn" onclick="event.stopPropagation(); selectDataset('classification')">
+                        Select CIC-IDS2017 Dataset &rarr;
+                    </button>
+                </article>
+
+                <!-- Dataset 3: Clustering (CIC-IDS2017 Behavioral Profiling) -->
+                <article class="dataset-card" id="cardClustering" style="cursor: pointer;" onclick="selectDataset('clustering')">
+                    <div class="card-track-badge badge-clustering">Track 3 · Clustering</div>
+                    <h3 class="card-title">Traffic Behavioral Profiling</h3>
+                    <p class="card-desc">Unsupervised flow profiling to discover distinct traffic behavioral personas (Interactive Web, Bulk Data, Micro-Burst Scans).</p>
+                    
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Dataset</span>
+                            <span class="meta-value">CIC-IDS2017 Feature Space (Unsupervised)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Evaluated</span>
+                            <span class="meta-value"><strong>5 Formulations</strong> (Hierarchical Ward, K-Means k=2/3/4, Complete Linkage)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Champion Model</span>
+                            <span class="meta-value">Agglomerative Hierarchical (Silhouette = 0.2202)</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block select-dataset-btn" onclick="event.stopPropagation(); selectDataset('clustering')">
+                        Select Profiling Dataset &rarr;
+                    </button>
+                </article>
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 2: INPUTS & OUTPUTS WORKSPACE (ACTIVE ON DATASET SELECT)  -->
+        <!-- ============================================================== -->
+        <main id="workspaceView" class="workspace-view" style="display: none;">
+            
+            <!-- Top Navigation & Track Tabs -->
+            <div class="workspace-nav">
+                <div class="workspace-nav-left">
+                    <button class="btn btn-outline btn-sm" onclick="returnToDatasetSelection()">
+                        &larr; All Datasets Overview
+                    </button>
+                    <div class="dataset-pill" id="activeDatasetPill">Selected: Track 1 · UNSW-NB15 QoS Degradation (Regression)</div>
+                </div>
+
+                <!-- Interactive 3-Track Quick Switcher Tabs -->
+                <div class="track-switcher-tabs" id="trackSwitcherTabs">
+                    <button type="button" class="track-tab-btn active" id="trackTab_regression" onclick="selectDataset('regression')">
+                        <span class="track-tab-num">1</span> UNSW-NB15 (Regression)
+                    </button>
+                    <button type="button" class="track-tab-btn" id="trackTab_classification" onclick="selectDataset('classification')">
+                        <span class="track-tab-num">2</span> CIC-IDS2017 (Classification)
+                    </button>
+                    <button type="button" class="track-tab-btn" id="trackTab_clustering" onclick="selectDataset('clustering')">
+                        <span class="track-tab-num">3</span> CIC-IDS2017 (Clustering)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dataset Active Header -->
+            <div class="active-dataset-header">
+                <h2 class="active-dataset-title" id="activeDatasetTitle">UNSW-NB15 Flow QoS Packet Loss Estimation</h2>
+                <p class="active-dataset-desc" id="activeDatasetDesc">Configure bidirectional flow telemetry parameters to evaluate predictions across all 10 trained regression algorithms.</p>
+            </div>
+
+            <!-- Quick Presets Row -->
+            <div class="presets-container" id="presetsContainer">
+                <span class="presets-label">Quick Presets:</span>
+                <div class="presets-list" id="presetsList">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- INPUT FORMS CONTAINER -->
+            <div class="form-card">
+                <!-- Form: Regression -->
+                <form id="formRegression" class="feature-form" style="display: none;" onsubmit="handleFormSubmit(event, 'regression')">
+                    <h3 class="form-section-title">Network Flow Parameters</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="reg_sbytes">Source Bytes (<code>sbytes</code>)</label>
+                            <input type="number" id="reg_sbytes" name="sbytes" min="0" max="20000000" value="1450" class="form-control">
+                            <span class="field-hint">Source to destination volume in bytes</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_dbytes">Destination Bytes (<code>dbytes</code>)</label>
+                            <input type="number" id="reg_dbytes" name="dbytes" min="0" max="20000000" value="2800" class="form-control">
+                            <span class="field-hint">Destination to source volume in bytes</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_spkts">Source Packets (<code>spkts</code>)</label>
+                            <input type="number" id="reg_spkts" name="spkts" min="1" max="100000" value="12" class="form-control">
+                            <span class="field-hint">Total packets sent from source</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_dpkts">Destination Packets (<code>dpkts</code>)</label>
+                            <input type="number" id="reg_dpkts" name="dpkts" min="0" max="100000" value="14" class="form-control">
+                            <span class="field-hint">Total packets received by destination</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_dur">Flow Duration (<code>dur</code>, sec)</label>
+                            <input type="number" id="reg_dur" name="dur" step="0.001" min="0.0001" max="100.0" value="0.045" class="form-control">
+                            <span class="field-hint">Total duration of the connection</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_rate">Packet Rate (<code>rate</code>, pps)</label>
+                            <input type="number" id="reg_rate" name="rate" step="1.0" min="0" max="2000000" value="577.0" class="form-control">
+                            <span class="field-hint">Total packets per second</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_sload">Source Load (<code>sload</code>, bps)</label>
+                            <input type="number" id="reg_sload" name="sload" step="1000" min="0" max="1000000000" value="232000" class="form-control">
+                            <span class="field-hint">Source bits per second</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_dload">Destination Load (<code>dload</code>, bps)</label>
+                            <input type="number" id="reg_dload" name="dload" step="1000" min="0" max="1000000000" value="448000" class="form-control">
+                            <span class="field-hint">Destination bits per second</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_sttl">Source TTL (<code>sttl</code>)</label>
+                            <input type="number" id="reg_sttl" name="sttl" min="0" max="255" value="64" class="form-control">
+                            <span class="field-hint">Source Time To Live value (hops)</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_dttl">Destination TTL (<code>dttl</code>)</label>
+                            <input type="number" id="reg_dttl" name="dttl" min="0" max="255" value="64" class="form-control">
+                            <span class="field-hint">Destination Time To Live value</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtnRegression">
+                            Run All 10 Algorithms &rarr;
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Form: Classification -->
+                <form id="formClassification" class="feature-form" style="display: none;" onsubmit="handleFormSubmit(event, 'classification')">
+                    <h3 class="form-section-title">Network Threat Flow Indicators</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="clf_port">Destination Port</label>
+                            <input type="number" id="clf_port" name="port" min="1" max="65535" value="443" class="form-control">
+                            <span class="field-hint">Target service port (e.g. 443 HTTPS, 80 HTTP, 22 SSH)</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_dur">Flow Duration (&micro;s)</label>
+                            <input type="number" id="clf_dur" name="dur" min="1" max="120000000" value="63706" class="form-control">
+                            <span class="field-hint">Microseconds connection elapsed</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_fwd_pkts">Total Forward Packets</label>
+                            <input type="number" id="clf_fwd_pkts" name="fwd_pkts" min="1" max="100000" value="10" class="form-control">
+                            <span class="field-hint">Number of packets in forward direction</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_bwd_pkts">Total Backward Packets</label>
+                            <input type="number" id="clf_bwd_pkts" name="bwd_pkts" min="0" max="100000" value="11" class="form-control">
+                            <span class="field-hint">Number of packets in backward direction</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_tot_fwd_len">Total Length of Fwd Packets (bytes)</label>
+                            <input type="number" id="clf_tot_fwd_len" name="tot_fwd_len" min="0" max="10000000" value="1052" class="form-control">
+                            <span class="field-hint">Total forward payload bytes</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_fwd_len_mean">Fwd Packet Length Mean</label>
+                            <input type="number" id="clf_fwd_len_mean" name="fwd_len_mean" step="0.1" min="0" max="10000" value="105.0" class="form-control">
+                            <span class="field-hint">Mean forward packet size in bytes</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_bytes_s">Flow Bytes / Second</label>
+                            <input type="number" id="clf_bytes_s" name="bytes_s" step="100" min="0" max="100000000" value="118047.0" class="form-control">
+                            <span class="field-hint">Aggregated bandwidth throughput</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_pkts_s">Flow Packets / Second</label>
+                            <input type="number" id="clf_pkts_s" name="pkts_s" step="10" min="0" max="10000000" value="329.0" class="form-control">
+                            <span class="field-hint">Packet transfer velocity</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_iat_mean">Flow IAT Mean (&micro;s)</label>
+                            <input type="number" id="clf_iat_mean" name="iat_mean" step="10" min="0" max="120000000" value="3185.0" class="form-control">
+                            <span class="field-hint">Mean inter-arrival time between packets</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_pkt_len_mean">Packet Length Mean (bytes)</label>
+                            <input type="number" id="clf_pkt_len_mean" name="pkt_len_mean" step="0.1" min="0" max="10000" value="318.0" class="form-control">
+                            <span class="field-hint">Average overall packet size</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_pkt_len_std">Packet Length Std Dev</label>
+                            <input type="number" id="clf_pkt_len_std" name="pkt_len_std" step="0.1" min="0" max="10000" value="27.0" class="form-control">
+                            <span class="field-hint">Standard deviation of packet sizes</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_syn_flag">SYN Flag Count</label>
+                            <select id="clf_syn_flag" name="syn_flag" class="form-control">
+                                <option value="0" selected>0 (No SYN)</option>
+                                <option value="1">1 (SYN Flag Set)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clf_ack_flag">ACK Flag Count</label>
+                            <select id="clf_ack_flag" name="ack_flag" class="form-control">
+                                <option value="1" selected>1 (ACK Flag Set)</option>
+                                <option value="0">0 (No ACK)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtnClassification">
+                            Run All 10 Algorithms &rarr;
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Form: Clustering -->
+                <form id="formClustering" class="feature-form" style="display: none;" onsubmit="handleFormSubmit(event, 'clustering')">
+                    <h3 class="form-section-title">Traffic Telemetry Vector</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cl_port">Destination Port</label>
+                            <input type="number" id="cl_port" name="port" min="1" max="65535" value="443" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_dur">Flow Duration (&micro;s)</label>
+                            <input type="number" id="cl_dur" name="dur" min="1" max="120000000" value="15000" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_fwd_pkts">Total Forward Packets</label>
+                            <input type="number" id="cl_fwd_pkts" name="fwd_pkts" min="1" max="100000" value="8" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_bwd_pkts">Total Backward Packets</label>
+                            <input type="number" id="cl_bwd_pkts" name="bwd_pkts" min="0" max="100000" value="8" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_tot_fwd_len">Total Length of Fwd Packets</label>
+                            <input type="number" id="cl_tot_fwd_len" name="tot_fwd_len" min="0" max="10000000" value="900" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_fwd_len_mean">Fwd Packet Length Mean</label>
+                            <input type="number" id="cl_fwd_len_mean" name="fwd_len_mean" step="0.1" min="0" max="10000" value="112.0" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_bytes_s">Flow Bytes / Second</label>
+                            <input type="number" id="cl_bytes_s" name="bytes_s" step="100" min="0" max="100000000" value="1500.0" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_pkts_s">Flow Packets / Second</label>
+                            <input type="number" id="cl_pkts_s" name="pkts_s" step="10" min="0" max="10000000" value="160.0" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_iat_mean">Flow IAT Mean (&micro;s)</label>
+                            <input type="number" id="cl_iat_mean" name="iat_mean" step="10" min="0" max="120000000" value="2500.0" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_pkt_len_mean">Packet Length Mean</label>
+                            <input type="number" id="cl_pkt_len_mean" name="pkt_len_mean" step="0.1" min="0" max="10000" value="120.0" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_pkt_len_std">Packet Length Std Dev</label>
+                            <input type="number" id="cl_pkt_len_std" name="pkt_len_std" step="0.1" min="0" max="10000" value="35.0" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_syn_flag">SYN Flag Count</label>
+                            <select id="cl_syn_flag" name="syn_flag" class="form-control">
+                                <option value="0" selected>0 (No SYN)</option>
+                                <option value="1">1 (SYN Set)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cl_ack_flag">ACK Flag Count</label>
+                            <select id="cl_ack_flag" name="ack_flag" class="form-control">
+                                <option value="1" selected>1 (ACK Set)</option>
+                                <option value="0">0 (No ACK)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtnClustering">
+                            Run All 5 Clustering Formulations &rarr;
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- OUTPUTS SECTION: COMPARATIVE RESULTS ACROSS ALL ALGORITHMS      -->
+            <!-- ============================================================== -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                
+                <div class="results-header">
+                    <h3 class="results-main-title">Comparative Results Across All Algorithms</h3>
+                    <p class="results-sub-title">Evaluation of submitted telemetry features across every model trained in this capstone track.</p>
+                </div>
+
+                <!-- 1. Champion Model Output -->
+                <div class="champion-card" id="championCard">
+                    <div class="champion-badge-row">
+                        <span class="badge-champion">Top Performing Algorithm</span>
+                        <span class="champion-model-name" id="championModelName">Random Forest Regressor (Tuned)</span>
+                    </div>
+
+                    <div class="champion-highlight-grid">
+                        <div class="champion-stat-box">
+                            <div class="champion-stat-label">Model Output for Submitted Inputs</div>
+                            <div class="champion-stat-value" id="championAnswerValue">0.00 pkts</div>
+                            <div class="champion-stat-unit" id="championAnswerUnit">Packets Dropped (sloss)</div>
+                        </div>
+
+                        <div class="champion-detail-box">
+                            <div class="champion-tier-badge" id="championTierBadge">Optimal QoS Performance</div>
+                            <p class="champion-recommendation" id="championRecommendation">
+                                Recommendation and network operational insight text will appear here.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Consolidated Comparison Table -->
+                <div class="table-card" id="tableCard">
+                    <div class="table-card-header">
+                        <div>
+                            <h4 class="table-title" id="tableTitle">Consolidated Algorithm Comparison Table</h4>
+                            <span class="table-caption" id="tableCaption">Live predictions evaluated alongside benchmark rubric metrics</span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="classic-table" id="algorithmsTable">
+                            <thead id="algorithmsTableHead">
+                                <!-- Populated dynamically based on track -->
+                            </thead>
+                            <tbody id="algorithmsTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. Visual Comparison Graphs -->
+                <div class="charts-card" id="chartsCard">
+                    <div class="charts-header">
+                        <h4 class="charts-title" id="chartsMainTitle">Algorithmic Evaluation Visualisations</h4>
+                        <div class="charts-tabs" id="chartsTabContainer">
+                            <button class="chart-tab active" id="tabChart1" onclick="switchChartTab('multimetric')">Multi-Metric (Cell 58)</button>
+                            <button class="chart-tab" id="tabChart2" onclick="switchChartTab('error')">Error Residuals (Cell 60)</button>
+                            <button class="chart-tab" id="tabChart3" onclick="switchChartTab('predictions')">Live Predictions</button>
+                        </div>
+                    </div>
+
+                    <div class="chart-wrapper">
+                        <canvas id="comparisonChartCanvas" height="360"></canvas>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="results-actions">
+                    <button class="btn btn-outline" onclick="scrollToInputs()">
+                        &uarr; Modify Inputs
+                    </button>
+                    <button class="btn btn-primary" onclick="returnToDatasetSelection()">
+                        &larr; Choose Another Dataset
+                    </button>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- Classic Footer -->
+        <footer class="classic-footer">
+            <div class="footer-inner">
+                <span>NetSentinel Capstone Project · Dynamic Multi-Algorithm Inference Suite</span>
+                <span>Tracks: Regression (UNSW-NB15), Classification (CIC-IDS2017), Clustering (CIC-IDS2017)</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Application Script -->
+    <script src="/static/js/main.js?v=20261022_1"></script>
+</body>
+</html>

@@ -303,6 +303,21 @@ jupyter notebook
 ```
 Navigate to `notebooks/` and open `regression.ipynb`, `classification.ipynb`, or `clustering.ipynb`.
 
+### 5. Launch Interactive Comparative Laboratory Web App
+```bash
+# Run Classic Multi-Algorithm Laboratory:
+python3 server.py
+
+# Or via Gunicorn WSGI production server:
+python3 -m gunicorn wsgi:app --bind 0.0.0.0:5001
+```
+Open **`http://localhost:5001`** in any web browser to:
+- Choose from 3 capstone tracks (**UNSW-NB15 Regression**, **CIC-IDS2017 Classification**, or **CIC-IDS2017 Clustering**).
+- Load quick domain flow presets (e.g. Low-Loss Interactive Flow, Volumetric DoS Hulk, Reconnaissance PortScan, etc.).
+- Run simultaneous live inference across all 10 trained algorithms per track.
+- View live prediction verdicts alongside official benchmark tables ($R^2$, RMSE, MAE, Accuracy, F1, ROC-AUC, Silhouette).
+- Analyze comparative Chart.js diagnostic visualizations.
+
 ---
 
 ## 👥 Academic Integrity & Course Attribution

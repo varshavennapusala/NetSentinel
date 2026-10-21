@@ -9,6 +9,7 @@
 [![Jupyter](https://img.shields.io/badge/Jupyter-Lab-F37626?style=for-the-badge&logo=jupyter&logoColor=white)](https://jupyter.org/)
 [![Course](https://img.shields.io/badge/Capstone-23CSE301-purple?style=for-the-badge)](https://github.com/ajay9376/NetSentinel)
 [![Review 1](https://img.shields.io/badge/Review%201-Completed-success?style=for-the-badge)](https://github.com/ajay9376/NetSentinel)
+[![Review 2](https://img.shields.io/badge/Review%202-Completed-success?style=for-the-badge)](https://github.com/ajay9376/NetSentinel)
 
 ---
 
@@ -25,7 +26,7 @@
 Each machine learning track is conducted independently using a dedicated, domain-standard benchmark dataset:
 * **Regression Track**: UNSW-NB15 dataset
 * **Classification Track**: CIC-IDS2017 dataset
-* **Clustering Track**: CTU-13 dataset
+* **Clustering Track**: CIC-IDS2017 (unsupervised feature space)
 
 ---
 
@@ -45,7 +46,7 @@ Modern network infrastructures require automated, machine-learning-driven monito
 | :--- | :--- | :--- | :--- |
 | **Regression** | **UNSW-NB15** | Continuous Source Packet Loss (`sloss`) | Network traffic QoS regression (ACCS / UNSW) |
 | **Classification** | **CIC-IDS2017** | Multi-class Threat Label (`Label`) | Network attack classification (CIC / UNB) |
-| **Clustering** | **CTU-13** | Unsupervised Traffic Clustering | Behavioral anomaly analysis (Stratosphere IPS / CTU) |
+| **Clustering** | **CIC-IDS2017** | Unsupervised Traffic Clustering | Behavioral anomaly profiling (unsupervised) |
 
 > [!NOTE]
 > The raw regression dataset (`UNSW_NB15_training-set.csv`) and classification dataset (`network_traffic_classification.csv`) are placed within their respective `data/` directories as documented in each folder's README.
@@ -110,31 +111,33 @@ NetSentinel/
 ---
 
 ### 🛡️ 2. Classification Track (Part A in Review 1, Part B in Review 2)
-* **Dataset**: CIC-IDS2017 (`data/classification/network_traffic_classification.csv`, 8,000 flow instances)
-* **Target Variable**: `Label` (9 discrete classes: BENIGN + 8 threat categories including DoS, PortScan, Brute Force, Web Attacks)
+* **Dataset**: CIC-IDS2017 (`data/classification/network_traffic_classification.csv`)
+* **Target Variable**: `Label` (Multi-class threat categories including BENIGN, DoS, PortScan, Brute Force, Web Attacks)
 * **Single Standardized Partition**: Stratified 80:20 train-test split (`random_state=42`) with `StandardScaler` fitted strictly on training data.
-* **Review 1 — Part A Algorithms**:
+* **Review 1 — Part A Algorithms** (5 models):
   1. Logistic Regression (Multinomial baseline)
   2. K-Nearest Neighbors (KNN)
   3. Gaussian Naive Bayes
   4. Decision Tree Classifier
   5. Support Vector Machine (SVC)
-* **Review 2 — Part B Algorithms**:
-  6. Random Forest Classifier
-  7. AdaBoost Classifier
-  8. Gradient Boosting Classifier
-  9. Bagging Classifier
-  10. Multi-Layer Perceptron (MLP) Classifier
-* **Required Metrics**: Accuracy, Precision, Recall, Weighted $F_1$-score, Macro $F_1$-score, Confusion Matrix, and One-vs-Rest ROC-AUC.
+* **Review 2 — Part B Algorithms** (5 models):
+  6. Random Forest Classifier (200 trees, Gini importance)
+  7. AdaBoost Classifier (150 estimators, SAMME)
+  8. Gradient Boosting Classifier (200 estimators, lr=0.1)
+  9. Bagging Classifier (Decision Tree base, 150 estimators)
+  10. Multi-Layer Perceptron (128→64 hidden layers, ReLU, Adam)
+* **Full Comparison**: All 10 algorithms compared on Accuracy, Precision, Recall, Weighted $F_1$-score, and One-vs-Rest ROC-AUC.
+* **Hyperparameter Tuning**: `GridSearchCV` (5-fold CV) applied to Random Forest and Gradient Boosting, with improvement documented.
 
 ---
 
 ### 🧩 3. Clustering Track (Evaluated in Review 2)
-* **Dataset**: CTU-13
-* **Planned Algorithms**:
-  1. K-Means Clustering
-  2. Agglomerative Hierarchical Clustering
-* **Required Metrics**: Silhouette Score, Davies-Bouldin Index, Calinski-Harabasz Index, Elbow Curve, Dendrogram, and PCA 2D scatter visualization.
+* **Dataset**: CIC-IDS2017 network traffic features (unsupervised — labels excluded during fitting)
+* **Algorithms**:
+  1. K-Means Clustering (optimal $k$ via Elbow + Silhouette analysis)
+  2. Agglomerative Hierarchical Clustering (Ward linkage)
+* **Evaluation Metrics**: Silhouette Score, Davies-Bouldin Index, Calinski-Harabasz Index
+* **Visualisations**: Elbow Curve, Dendrogram, PCA 2D scatter plots (both algorithms), t-SNE 2D scatter plots, ground-truth comparison overlay.
 
 ---
 
@@ -206,6 +209,67 @@ All 5 Part-A classification algorithms evaluated on the held-out test split (1,5
 1. **Tree & Margin Superiority**: Decision Tree and Linear SVM establish the strongest trade-offs between precision and recall across both volumetric attacks (`DoS Hulk`) and stealthy intrusions (`PortScan`).
 2. **Impact of Feature Standardization**: Distance-sensitive algorithms (KNN, SVM, Logistic Regression) exhibit high numerical stability and rapid convergence when standardized via `StandardScaler`.
 3. **Probabilistic Baseline**: Gaussian Naive Bayes offers the lowest training latency (analytical closed-form estimation) and achieves strong ROC-AUC (0.9802), despite its conditional independence assumption being partially violated on correlated network telemetry.
+
+---
+
+### 🛡️ Classification Track: Full 10-Algorithm Benchmark Results (Review 2 — A2)
+
+Per the Review 2 rubric (**A2**), all 10 classification algorithms (Part A + Part B) were trained on the unified preprocessed CIC-IDS2017 dataset and evaluated on the same held-out test split (1,588 flows), ranked strictly by **Weighted $F_1$-Score**:
+
+| Rank | Algorithm | Part | Test Accuracy | Weighted Precision | Weighted Recall | Weighted $F_1$ | ROC-AUC (OvR) |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | **Logistic Regression** | Part A | **89.92%** | 0.8402 | **0.8992** | **0.8649** | **0.9815** |
+| 2 | **Random Forest Classifier** | Part B | **89.92%** | 0.8381 | **0.8992** | **0.8640** | 0.9799 |
+| 3 | **Support Vector Machine (SVC)** | Part A | 89.80% | 0.8383 | 0.8980 | **0.8634** | 0.9813 |
+| 4 | **Bagging Classifier** | Part B | 89.48% | 0.8363 | 0.8948 | **0.8612** | 0.9788 |
+| 5 | **Gradient Boosting Classifier** | Part B | 88.85% | 0.8433 | 0.8885 | **0.8597** | 0.9773 |
+| 6 | **MLP Classifier (Neural Net)** | Part B | 89.61% | 0.8324 | 0.8961 | **0.8597** | 0.9809 |
+| 7 | **Decision Tree Classifier** | Part A | 88.79% | 0.8428 | 0.8879 | **0.8595** | 0.9637 |
+| 8 | **AdaBoost Classifier** | Part B | 89.67% | **0.8755** | 0.8967 | **0.8585** | 0.9807 |
+| 9 | **K-Nearest Neighbors (KNN)** | Part A | 87.22% | 0.8308 | 0.8722 | **0.8486** | 0.9555 |
+| 10 | **Gaussian Naive Bayes** | Part A | 76.20% | 0.8319 | 0.7620 | **0.7696** | 0.9810 |
+
+---
+
+### ⚙️ Classification Hyperparameter Tuning Results (`GridSearchCV`) (Review 2 — A3)
+
+| Model | Variant | Best Parameters | CV F1 (Weighted) | Test Accuracy | Test Weighted $F_1$ | ROC-AUC (OvR) |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: |
+| **Random Forest** | Default | `n_estimators=200, max_depth=None` | — | 89.92% | 0.8640 | 0.9799 |
+| **Random Forest** | **Tuned** | `{'max_depth': 15, 'min_samples_split': 5, 'n_estimators': 200}` | **0.8633** | 89.80% | 0.8630 | 0.9786 |
+| **Gradient Boosting** | Default | `n_estimators=100, learning_rate=0.10` | — | 88.85% | 0.8597 | 0.9773 |
+| **Gradient Boosting** | **Tuned** | `{'learning_rate': 0.12, 'n_estimators': 60}` | **0.8640** | **89.04%** | **0.8619** | **0.9778** |
+
+*Tuning Gradient Boosting achieved a **+0.19% Accuracy** and **+0.22% Weighted $F_1$** improvement on held-out test traffic.*
+
+---
+
+### 🔄 Classification 5-Fold Stratified Cross-Validation (Top 2 Models)
+
+| Model | Fold 1 $F_1$ | Fold 2 $F_1$ | Fold 3 $F_1$ | Fold 4 $F_1$ | Fold 5 $F_1$ | Mean CV $F_1$ | Std Dev ($\sigma$) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Tuned Random Forest** | 0.86189 | 0.86502 | 0.86427 | 0.86557 | 0.86165 | **0.86368** | **0.00162** |
+| **Tuned Gradient Boosting** | 0.86182 | 0.86047 | 0.85499 | 0.85654 | 0.86065 | **0.85889** | **0.00264** |
+
+---
+
+### 🧩 Clustering Track: Benchmark Results (Review 2 — Section B)
+
+Both K-Means and Agglomerative Hierarchical Clustering were applied to standardised CIC-IDS2017 features without label guidance during fitting.
+
+#### Official Algorithm Comparison Table (Rubric B2)
+| Algorithm | Cluster Count ($k$) | Silhouette Score | Davies-Bouldin Index | Calinski-Harabasz Index | Fit Time (s) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **K-Means Clustering** | 2 | 0.2175 | **1.8613** | **1522.66** | **0.045s** |
+| **Agglomerative Hierarchical (Ward)** | 2 | **0.2202** | 1.8907 | 1508.09 | 0.932s |
+
+#### Linkage Strategy Comparison for Hierarchical Clustering (Rubric B1)
+| Linkage Strategy | Silhouette Score | Davies-Bouldin Index | Calinski-Harabasz Index | Cluster Distribution | Analytical Assessment |
+| :--- | :---: | :---: | :---: | :--- | :--- |
+| **Ward (`ward`)** | 0.2202 | 1.8907 | **1508.09** | `C0: 2,157, C1: 5,783` | **Selected Optimal**: Balanced, variance-minimizing partitions |
+| **Complete (`complete`)** | 0.8679 | 0.3771 | 278.28 | `C0: 7,937, C1: 3` | Severe cluster chaining; single massive cluster + outliers |
+| **Average (`average`)** | 0.8679 | 0.3771 | 278.28 | `C0: 7,937, C1: 3` | Severe cluster chaining; single massive cluster + outliers |
+| **Single (`single`)** | 0.8718 | 0.0894 | 105.51 | `C0: 7,939, C1: 1` | Pathological chaining; 1 isolated flow forms separate cluster |
 
 ---
 

@@ -7,3 +7,6 @@ scipy
 jupyter
 notebook
 openpyxl
+streamlit
+plotly
+joblib

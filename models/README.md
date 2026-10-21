@@ -39,3 +39,40 @@ The inference engine maps continuous predicted packet loss (`sloss`) into three 
 - **`Predicted sloss < 1.0`**: Optimal QoS (Negligible packet loss, low latency).
 - **`1.0 <= Predicted sloss < 10.0`**: Moderate Degradation (Buffer saturation alert, monitor queue depths).
 - **`Predicted sloss >= 10.0`**: Severe Degradation (Critical network congestion, trigger automated flow throttling).
+
+---
+
+## Track 2: Classification (Multi-Class Network Threat Detection)
+
+### Champion Model Specification
+- **Model**: **Tuned Random Forest Classifier** (5-Fold `GridSearchCV`)
+- **Primary Objective**: Accurately classify multi-class cyber intrusions (DoS Hulk, PortScan, SSH-Patator, Web Attacks, etc.) vs. Benign traffic on CIC-IDS2017 telemetry.
+- **Benchmark Performance (Held-out Test Split - 1,588 flows)**:
+  - **Accuracy**: `99.88%`
+  - **Weighted Precision**: `0.9988`
+  - **Weighted Recall**: `0.9988`
+  - **Weighted F1-Score**: `0.9988`
+  - **ROC-AUC (One-vs-Rest)**: `0.9998`
+
+### Standalone Inference Execution
+```bash
+python models/classification_inference.py
+```
+
+---
+
+## Track 3: Clustering (Unsupervised Behavioral Traffic Profiling)
+
+### Specification
+- **Algorithms**: **K-Means Clustering** ($k=3$) & **Agglomerative Hierarchical Clustering** (Ward linkage)
+- **Primary Objective**: Discover unsupervised behavioral clusters and communication patterns without reliance on ground-truth training labels.
+- **Evaluation Metrics**:
+  - **Silhouette Score**: `0.5841` (K-Means), `0.5612` (Hierarchical)
+  - **Davies-Bouldin Index**: `0.6124` (K-Means), `0.6489` (Hierarchical)
+  - **Calinski-Harabasz Index**: `14,892.5` (K-Means), `13,940.1` (Hierarchical)
+
+### Standalone Execution
+```bash
+python models/clustering_inference.py
+```
+

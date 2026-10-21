@@ -1,14 +1,12 @@
-pandas
-numpy
-scikit-learn
-matplotlib
-seaborn
-scipy
-jupyter
-notebook
-openpyxl
-streamlit
-plotly
-joblib
+# ==============================================================================
+# NetSentinel — Production Web Application & Deployment Requirements
+# Optimized for Render Free Tier (512MB RAM), Streamlit Cloud, & Fast Builds
+# ==============================================================================
 flask>=3.0.0
 gunicorn>=21.2.0
+scikit-learn>=1.3.0
+pandas>=2.0.0
+numpy>=1.24.0
+joblib>=1.3.0
+streamlit>=1.30.0
+plotly>=5.18.0
